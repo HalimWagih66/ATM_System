@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{133ca218-cb15-430c-8649-ec2ee315b8a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\utils">
+      <UniqueIdentifier>{18777079-9b22-4acc-8d36-fad680710ee8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\utils\headers">
+      <UniqueIdentifier>{67343776-9d67-46fd-8bfd-ec3dda14d35e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\utils\implementaions">
+      <UniqueIdentifier>{a8ec9623-8a07-4006-906a-21c5153cacaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features">
+      <UniqueIdentifier>{c95d2c5e-b8c2-44c3-8205-10be1a294097}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\atm">
+      <UniqueIdentifier>{e82e9427-6a28-4f30-9019-c985e2cec7ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{5fabecc3-6f94-436d-8500-a80bb7acf6a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\constants">
+      <UniqueIdentifier>{0b476824-3963-4c7b-97ef-7203e2cf1813}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\atm\models">
+      <UniqueIdentifier>{4daf364d-14e3-42d1-a90d-cab96036bbe8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\atm\models\client info">
+      <UniqueIdentifier>{699c2fb7-95f6-4fed-b730-29e3c652a7b6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="core\utils\headers\console_helper.h">
+      <Filter>core\utils\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="core\utils\headers\data_reader.h">
+      <Filter>core\utils\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="core\utils\headers\file_operations.h">
+      <Filter>core\utils\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="core\utils\headers\string_operations.h">
+      <Filter>core\utils\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="atm.h">
+      <Filter>features\atm</Filter>
+    </ClInclude>
+    <ClInclude Include="core\constants\file_pathes.h">
+      <Filter>core\constants</Filter>
+    </ClInclude>
+    <ClInclude Include="features\atm\models\client info\client_info.h">
+      <Filter>features\atm\models\client info</Filter>
+    </ClInclude>
+    <ClInclude Include="core\utils\headers\input_validator_utils.h">
+      <Filter>core\utils\headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="core\utils\implementaions\console_helper.cpp">
+      <Filter>core\utils\implementaions</Filter>
+    </ClCompile>
+    <ClCompile Include="core\utils\implementaions\data_reader.cpp">
+      <Filter>core\utils\implementaions</Filter>
+    </ClCompile>
+    <ClCompile Include="core\utils\implementaions\file_operations.cpp">
+      <Filter>core\utils\implementaions</Filter>
+    </ClCompile>
+    <ClCompile Include="core\utils\implementaions\string_operations.cpp">
+      <Filter>core\utils\implementaions</Filter>
+    </ClCompile>
+    <ClCompile Include="atm.cpp">
+      <Filter>features\atm</Filter>
+    </ClCompile>
+    <ClCompile Include="core\constants\file_pathes.cpp">
+      <Filter>core\constants</Filter>
+    </ClCompile>
+    <ClCompile Include="features\atm\models\client info\client_info.cpp">
+      <Filter>features\atm\models\client info</Filter>
+    </ClCompile>
+    <ClCompile Include="core\utils\implementaions\input_validator_utils.cpp">
+      <Filter>core\utils\implementaions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\atm_system.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
