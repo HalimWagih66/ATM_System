@@ -123,23 +123,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="atm.h" />
     <ClInclude Include="core\constants\file_pathes.h" />
     <ClInclude Include="core\utils\headers\console_helper.h" />
     <ClInclude Include="core\utils\headers\data_reader.h" />
     <ClInclude Include="core\utils\headers\file_operations.h" />
     <ClInclude Include="core\utils\headers\input_validator_utils.h" />
     <ClInclude Include="core\utils\headers\string_operations.h" />
+    <ClInclude Include="features\atm\atm.h" />
     <ClInclude Include="features\atm\models\client info\client_info.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="atm.cpp" />
     <ClCompile Include="core\constants\file_pathes.cpp" />
     <ClCompile Include="core\utils\implementaions\console_helper.cpp" />
     <ClCompile Include="core\utils\implementaions\data_reader.cpp" />
     <ClCompile Include="core\utils\implementaions\file_operations.cpp" />
     <ClCompile Include="core\utils\implementaions\input_validator_utils.cpp" />
     <ClCompile Include="core\utils\implementaions\string_operations.cpp" />
+    <ClCompile Include="features\atm\atm.cpp" />
     <ClCompile Include="features\atm\models\client info\client_info.cpp" />
     <ClCompile Include="src\atm_system.cpp" />
   </ItemGroup>
