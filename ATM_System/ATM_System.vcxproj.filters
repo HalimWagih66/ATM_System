@@ -59,7 +59,7 @@
       <Filter>core\utils\headers</Filter>
     </ClInclude>
     <ClInclude Include="features\atm\atm.h">
-      <Filter>features</Filter>
+      <Filter>features\atm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -88,7 +88,7 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="features\atm\atm.cpp">
-      <Filter>features</Filter>
+      <Filter>features\atm</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

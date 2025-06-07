@@ -27,17 +27,23 @@ private:
 
 	void ShowMainMenuOptions()const; // Displays the main menu options for the logged-in client
 
+	short getQuickWithDrawAmount(const short& QuickWithDrawOption);
+
 	void ShowWithdrawOptions(const vector<short>& WithdrawOptions)const; // Displays the withdrawal options available to the client
 
 	void ProcessWithdrawalIfPossible(const int& amount); // Processes the withdrawal if the amount is valid and available in the account
 
-	short ReadValidChoiceQuickWithdraw(const short& numberOfOptions)const;// Reads a valid choice for quick withdrawal from user input
+	short ReadQuickWithdrawOption(const short& numberOfOptions)const;// Reads a valid choice for quick withdrawal from user input
 
 	void ShowQuickWithdrawScreen(); // Displays the quick withdrawal screen for the logged-in client
+
+	void PerfromNormalWithdrawOption(const int& amount);
 
 	void ShowNormalWithdrawScreen(); // Displays the normal withdrawal screen for the logged-in client
 
 	int ReadAmountForDeposit()const;		 // Reads the amount to be deposited from user input and returns it
+
+	void PerformDepositOption(const int& amount);
 
 	void ShowDepositScreen(); // Displays the deposit screen for the logged-in client
 
@@ -50,6 +56,10 @@ private:
 	void GoBackToMainMenu()const; // Returns to the main menu after performing an action
 
 	void ShowMainMenuScreen(); // Displays the main menu after successful login
+
+	bool LoadClientInfo(const string& AccountNumber, const string& PinCode, const vector<ClientInfo>& clients); // Loads client information based on account number and pin code
+
+	void PerformQuickWithdrawOpiton(const short& quickWithdrawOption); // Performs the quick withdrawal based on the selected option
 
 public:
 	~ATM();

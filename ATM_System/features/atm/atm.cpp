@@ -8,11 +8,12 @@
 #include "../../core/utils/headers/input_validator_utils.h"
 #include "../../core/utils/headers/file_operations.h"
 
+enum class IndexResult {
+	NotFound = -1
+};
+
 // Destructor: Save any changes made to the logged-in client before destroying the ATM object
-ATM::~ATM()
-{
-	SaveClientChanges(FilePathes::Clients);
-}
+ATM::~ATM(){}
 
 // Displays the login screen and handles user authentication
 void ATM::LoginScreen()
@@ -37,7 +38,7 @@ void ATM::LoginScreen()
 			continue;
 		}
 
-		isUserFound = FindClientByAccountNumberAndPinCode(AccountNumber, PinCode, LoggedClient, LoggedClientIndex, clients); // Attempt to find the client using the provided account number and pin code
+		isUserFound = LoadClientInfo(AccountNumber, PinCode, clients); // Attempt to find the client using the provided account number and pin code
 
 		if (!isUserFound) {
 			ConsoleHelper::ShowMessageAndPauseThenClear("Client not found. Please check your account number and pin code."); // If client is not found, show an error message and prompt again
@@ -48,6 +49,8 @@ void ATM::LoginScreen()
 	} while (true);
 
 	ShowMainMenuScreen(); // Show main ATM menu after successful login
+
+	SaveClientChanges(FilePathes::Clients); // Save any changes made to the logged-in client
 }
 
 // Loads clients from a file and returns a vector of ClientInfo objects
@@ -71,7 +74,7 @@ int ATM::GetClientIndexByAccountNumberAndPinCode(const string& AccountNumber, co
 		if (Clients[i].getAccountNumber() == AccountNumber && Clients[i].getPinCode() == PinCode) // Check if both account number and pin code match
 			return i;
 	}
-	return -1; // Not found
+	return (int)IndexResult::NotFound; // Not found
 }
 
 // Finds and returns a client if account number and pin match; also returns index
@@ -80,7 +83,7 @@ bool ATM::FindClientByAccountNumberAndPinCode(const string& AccountNumber, const
 	int ClientIndex = GetClientIndexByAccountNumberAndPinCode(AccountNumber, PinCode, Clients); // Get the index of the client
 	LoggedClientReference = ClientIndex;
 
-	if (ClientIndex != -1) {
+	if (ClientIndex != (int)IndexResult::NotFound) {
 		LoggedClient = Clients[ClientIndex];
 		return true;
 	}
@@ -116,6 +119,30 @@ void ATM::ShowMainMenuOptions()const
 	cout << "\t[4] Check Balance.\n";
 	cout << "\t[5] Logout.\n";
 }
+short ATM::getQuickWithDrawAmount(const short& QuickWithDrawOption)
+{
+	switch (QuickWithDrawOption)
+	{
+	case 1:
+		return 20;
+	case 2:
+		return 50;
+	case 3:
+		return 100;
+	case 4:
+		return 200;
+	case 5:
+		return 400;
+	case 6:
+		return 600;
+	case 7:
+		return 800;
+	case 8:
+		return 1000;
+	default:
+		return 0;
+	}
+}
 
 // Displays quick withdrawal options in two columns
 void ATM::ShowWithdrawOptions(const vector<short>& WithdrawOptions)const {
@@ -130,14 +157,20 @@ void ATM::ShowWithdrawOptions(const vector<short>& WithdrawOptions)const {
 }
 
 // Reads a valid option from the user for quick withdrawal
-short ATM::ReadValidChoiceQuickWithdraw(const short& numberOfOptions) const{
+short ATM::ReadQuickWithdrawOption(const short& numberOfOptions) const{
 	short choice;
 	do {
-		choice = DataReader::PromptAndReadNumber("Choose What to Withdraw from [1 ~ 8] : ");
+		choice = DataReader::PromptAndReadNumber("Choose What to Withdraw from [1 ~ 9] : ");
 	} while (choice < 1 || choice > numberOfOptions + 1);
 	return choice;
 }
 
+void ATM::PerformQuickWithdrawOpiton(const short& quickWithdrawOption)
+{
+	if (quickWithdrawOption == 9) return; // Exit
+
+	ProcessWithdrawalIfPossible(getQuickWithDrawAmount(quickWithdrawOption)); // Process the withdrawal if the choice is valid
+}
 // Displays quick withdrawal screen and handles selection
 void ATM::ShowQuickWithdrawScreen() {
 	ConsoleHelper::ShowScreenHeader("Quick Withdraw");
@@ -148,12 +181,10 @@ void ATM::ShowQuickWithdrawScreen() {
 
 	cout << "Your Balance is : " << LoggedClient.getAccountBalance() << "\n\n\n";
 
-	short choice = ReadValidChoiceQuickWithdraw(WithdrawOptions.size()); // Read a valid choice from the user
+	short quickWithdrawOption = ReadQuickWithdrawOption(WithdrawOptions.size()); // Read a valid choice from the user
 	cout << "\n\n";
 
-	if (choice == 9) return; // Exit
-
-	ProcessWithdrawalIfPossible(WithdrawOptions[choice - 1]); // Process the withdrawal if the choice is valid
+	PerformQuickWithdrawOpiton(quickWithdrawOption);
 }
 
 // Performs withdrawal if balance is sufficient
@@ -186,6 +217,11 @@ int ReadAmountMultipleOfFive() {
 	return amount;
 }
 
+void ATM::PerfromNormalWithdrawOption(const int& amount)
+{
+	ProcessWithdrawalIfPossible(amount); // Process the withdrawal if the amount is valid
+}
+
 // Displays the normal withdrawal screen
 void ATM::ShowNormalWithdrawScreen() {
 	ConsoleHelper::ShowScreenHeader("Normal Withdraw Screen");
@@ -207,20 +243,26 @@ int ATM::ReadAmountForDeposit()const {
 	return amount;
 }
 
-// Displays deposit screen and processes deposit
-void ATM::ShowDepositScreen() {
-	ConsoleHelper::ShowScreenHeader("Deposit Screen");
-
-	int amount = ReadAmountForDeposit();
-	cout << "\n\n";
-
+void ATM::PerformDepositOption(const int& amount)
+{
 	if (ConsoleHelper::AreYouSure("Are you sure you want to deposit " + to_string(amount) + " ? [Y/N]? ")) {
-		LoggedClient.setAccountBalance(LoggedClient.getAccountBalance() + amount);
+		LoggedClient.setAccountBalance(LoggedClient.getAccountBalance() + amount); // Update the account balance
 		cout << "\n\nDeposit successful! New Balance is : " << LoggedClient.getAccountBalance() << endl;
 	}
 	else {
-		cout << "The deposit was not completed. Your balance remains the same.\n";
+		cout << "The deposit was not completed. Your balance remains the same.\n"; // If user cancels, show a message
 	}
+}
+
+// Displays deposit screen and processes deposit
+void ATM::ShowDepositScreen() {
+	ConsoleHelper::ShowScreenHeader("Deposit Screen"); // Show the deposit screen header
+
+	int amount = ReadAmountForDeposit(); // Read a valid amount for deposit
+
+	cout << "\n\n";
+
+	PerformDepositOption(amount); // Perform the deposit operation with the entered amount
 }
 
 // Shows client's current balance
@@ -238,23 +280,23 @@ void ATM::ShowCheckBalanceScreen() const{
 void ATM::PerformMainMenuOption(const enMainMenuOptions& enMainMenuOption) {
 	switch (enMainMenuOption) {
 	case eQuickWithdraw:
-		ConsoleHelper::ClearScreen();
-		ShowQuickWithdrawScreen();
+		ConsoleHelper::ClearScreen(); // Clear the screen before showing quick withdraw options
+		ShowQuickWithdrawScreen(); // Show the quick withdraw screen
 		GoBackToMainMenu();
 		break;
 	case eNormalWithdraw:
-		ConsoleHelper::ClearScreen();
-		ShowNormalWithdrawScreen();
+		ConsoleHelper::ClearScreen(); // Clear the screen before showing normal withdraw options
+		ShowNormalWithdrawScreen(); // Show the normal withdraw screen
 		GoBackToMainMenu();
 		break;
 	case eDeposit:
-		ConsoleHelper::ClearScreen();
-		ShowDepositScreen();
+		ConsoleHelper::ClearScreen(); // Clear the screen before showing deposit options
+		ShowDepositScreen(); // Show the deposit screen
 		GoBackToMainMenu();
 		break;
 	case eCheckBalance:
-		ConsoleHelper::ClearScreen();
-		ShowCheckBalanceScreen();
+		ConsoleHelper::ClearScreen(); // Clear the screen before showing balance
+		ShowCheckBalanceScreen(); // Show the current account balance
 		GoBackToMainMenu();
 		break;
 	case eLogout:
@@ -276,10 +318,24 @@ void ATM::ShowMainMenuScreen() {
 	do
 	{
 		ConsoleHelper::ClearScreen(); // Clear the screen before showing the menu
+
 		ConsoleHelper::ShowScreenHeader("ATM Main Menu Screen");
+
 		ShowMainMenuOptions(); // Display main menu options
+
 		cout << "=====================================\n";
+
 		choice = DataReader::PromptAndReadNumber("Please enter your choice [1 - 5]: "); // Read user choice
-		PerformMainMenuOption((enMainMenuOptions)choice);
+
+		PerformMainMenuOption((enMainMenuOptions)choice); // Perform the action based on user choice
+
 	} while (choice != 5); // Exit on logout
 }
+
+bool ATM::LoadClientInfo(const string& AccountNumber, const string& PinCode, const vector<ClientInfo>& clients) // Attempts to load client information based on account number and pin code
+{
+
+	return FindClientByAccountNumberAndPinCode(AccountNumber, PinCode, LoggedClient, LoggedClientIndex, clients) ? true : false; // Attempt to find the client using the provided account number and pin code
+}
+
+
