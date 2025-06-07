@@ -37,7 +37,7 @@ private:
 
 	void ShowQuickWithdrawScreen(); // Displays the quick withdrawal screen for the logged-in client
 
-	void PerfromNormalWithdrawOption(const int& amount);
+	void PerformNormalWithdrawOption(const int& amount);
 
 	void ShowNormalWithdrawScreen(); // Displays the normal withdrawal screen for the logged-in client
 

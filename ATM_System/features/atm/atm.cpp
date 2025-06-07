@@ -53,6 +53,122 @@ void ATM::LoginScreen()
 	SaveClientChanges(FilePathes::Clients); // Save any changes made to the logged-in client
 }
 
+// Displays the main ATM menu loop
+void ATM::ShowMainMenuScreen() {
+	int choice;
+	do
+	{
+		ConsoleHelper::ClearScreen(); // Clear the screen before showing the menu
+
+		ConsoleHelper::ShowScreenHeader("ATM Main Menu Screen");
+
+		ShowMainMenuOptions(); // Display main menu options
+
+		cout << "=====================================\n";
+
+		choice = DataReader::PromptAndReadNumber("Please enter your choice [1 - 5]: "); // Read user choice
+
+		PerformMainMenuOption((enMainMenuOptions)choice); // Perform the action based on user choice
+
+	} while (choice != 5); // Exit on logout
+}
+
+// Executes the selected main menu option
+void ATM::PerformMainMenuOption(const enMainMenuOptions& enMainMenuOption) {
+	switch (enMainMenuOption) {
+	case eQuickWithdraw:
+		ConsoleHelper::ClearScreen(); // Clear the screen before showing quick withdraw options
+		ShowQuickWithdrawScreen(); // Show the quick withdraw screen
+		GoBackToMainMenu();
+		break;
+	case eNormalWithdraw:
+		ConsoleHelper::ClearScreen(); // Clear the screen before showing normal withdraw options
+		ShowNormalWithdrawScreen(); // Show the normal withdraw screen
+		GoBackToMainMenu();
+		break;
+	case eDeposit:
+		ConsoleHelper::ClearScreen(); // Clear the screen before showing deposit options
+		ShowDepositScreen(); // Show the deposit screen
+		GoBackToMainMenu();
+		break;
+	case eCheckBalance:
+		ConsoleHelper::ClearScreen(); // Clear the screen before showing balance
+		ShowCheckBalanceScreen(); // Show the current account balance
+		GoBackToMainMenu();
+		break;
+	case eLogout:
+		ConsoleHelper::ClearScreen();
+		break;
+	}
+}
+
+// Screens
+
+// Displays quick withdrawal screen and handles selection
+void ATM::ShowQuickWithdrawScreen() {
+	ConsoleHelper::ShowScreenHeader("Quick Withdraw");
+
+	vector<short> WithdrawOptions = { 20, 50, 100, 200, 400, 600, 800, 1000 };
+
+	ShowWithdrawOptions(WithdrawOptions); // Display the withdrawal options
+
+	cout << "Your Balance is : " << LoggedClient.getAccountBalance() << "\n\n\n";
+
+	short quickWithdrawOption = ReadQuickWithdrawOption(WithdrawOptions.size()); // Read a valid choice from the user
+	cout << "\n\n";
+
+	PerformQuickWithdrawOpiton(quickWithdrawOption); // Perform the withdrawal operation based on the user's choice
+}
+
+// Reads a valid amount that is a multiple of 5
+int ReadAmountMultipleOfFive() {
+	int amount = 0;
+	do {
+		amount = DataReader::PromptAndReadNumber("Enter an amount (must be a multiple of 5): ");
+		if (amount % 5 != 0) {
+			cout << "Invalid amount. Please enter a value that's a multiple of 5.\n";
+		}
+	} while (amount % 5 != 0);
+	return amount;
+}
+
+// Displays the normal withdrawal screen
+void ATM::ShowNormalWithdrawScreen() {
+	ConsoleHelper::ShowScreenHeader("Normal Withdraw Screen");
+	cout << "\n";
+	int amount = ReadAmountMultipleOfFive(); // Read a valid amount that is a multiple of 5
+	cout << "\n\n";
+	ProcessWithdrawalIfPossible(amount); // Process the withdrawal if possible
+}
+
+// Displays balance checking screen
+void ATM::ShowCheckBalanceScreen() const {
+	ConsoleHelper::ShowScreenHeader("Check Balance Screen");
+	ShowAccountBalance();
+}
+
+// Displays deposit screen and processes deposit
+void ATM::ShowDepositScreen() {
+	ConsoleHelper::ShowScreenHeader("Deposit Screen"); // Show the deposit screen header
+
+	int amount = ReadAmountForDeposit(); // Read a valid amount for deposit
+
+	cout << "\n\n";
+
+	PerformDepositOption(amount); // Perform the deposit operation with the entered amount
+}
+
+
+
+// Saves changes to the logged-in client back to the file
+void ATM::SaveClientChanges(const string& filePath)const
+{
+	vector<ClientInfo> vClients = LoadClientsFromFile(filePath);
+	vClients[LoggedClientIndex] = LoggedClient; // Update the logged-in client's data
+	vector<string> vRecords = ConvertClientsToString(vClients); // Convert the updated client data to string records
+	FileOperations::SaveRecordsInFile(vRecords, filePath); // Save the updated records back to the file
+}
+
 // Loads clients from a file and returns a vector of ClientInfo objects
 vector<ClientInfo> ATM::LoadClientsFromFile(const string& filename)const
 {
@@ -88,15 +204,6 @@ bool ATM::FindClientByAccountNumberAndPinCode(const string& AccountNumber, const
 		return true;
 	}
 	return false;
-}
-
-// Saves changes to the logged-in client back to the file
-void ATM::SaveClientChanges(const string& filePath)const
-{
-	vector<ClientInfo> vClients = LoadClientsFromFile(filePath);
-	vClients[LoggedClientIndex] = LoggedClient; // Update the logged-in client's data
-	vector<string> vRecords = ConvertClientsToString(vClients); // Convert the updated client data to string records
-	FileOperations::SaveRecordsInFile(vRecords, filePath); // Save the updated records back to the file
 }
 
 // Converts a list of ClientInfo objects to their string representations
@@ -160,7 +267,7 @@ void ATM::ShowWithdrawOptions(const vector<short>& WithdrawOptions)const {
 short ATM::ReadQuickWithdrawOption(const short& numberOfOptions) const{
 	short choice;
 	do {
-		choice = DataReader::PromptAndReadNumber("Choose What to Withdraw from [1 ~ 9] : ");
+		choice = DataReader::PromptAndReadNumber("Choose What to Withdraw from [1 ~ 9] : "); // Prompt user for a choice
 	} while (choice < 1 || choice > numberOfOptions + 1);
 	return choice;
 }
@@ -171,21 +278,7 @@ void ATM::PerformQuickWithdrawOpiton(const short& quickWithdrawOption)
 
 	ProcessWithdrawalIfPossible(getQuickWithDrawAmount(quickWithdrawOption)); // Process the withdrawal if the choice is valid
 }
-// Displays quick withdrawal screen and handles selection
-void ATM::ShowQuickWithdrawScreen() {
-	ConsoleHelper::ShowScreenHeader("Quick Withdraw");
 
-	vector<short> WithdrawOptions = { 20, 50, 100, 200, 400, 600, 800, 1000 };
-
-	ShowWithdrawOptions(WithdrawOptions); // Display the withdrawal options
-
-	cout << "Your Balance is : " << LoggedClient.getAccountBalance() << "\n\n\n";
-
-	short quickWithdrawOption = ReadQuickWithdrawOption(WithdrawOptions.size()); // Read a valid choice from the user
-	cout << "\n\n";
-
-	PerformQuickWithdrawOpiton(quickWithdrawOption);
-}
 
 // Performs withdrawal if balance is sufficient
 void ATM::ProcessWithdrawalIfPossible(const int& amount)
@@ -205,30 +298,9 @@ void ATM::ProcessWithdrawalIfPossible(const int& amount)
 	}
 }
 
-// Reads a valid amount that is a multiple of 5
-int ReadAmountMultipleOfFive() {
-	int amount = 0;
-	do {
-		amount = DataReader::PromptAndReadNumber("Enter an amount (must be a multiple of 5): ");
-		if (amount % 5 != 0) {
-			cout << "Invalid amount. Please enter a value that's a multiple of 5.\n";
-		}
-	} while (amount % 5 != 0);
-	return amount;
-}
-
-void ATM::PerfromNormalWithdrawOption(const int& amount)
+void ATM::PerformNormalWithdrawOption(const int& amount)
 {
 	ProcessWithdrawalIfPossible(amount); // Process the withdrawal if the amount is valid
-}
-
-// Displays the normal withdrawal screen
-void ATM::ShowNormalWithdrawScreen() {
-	ConsoleHelper::ShowScreenHeader("Normal Withdraw Screen");
-	cout << "\n";
-	int amount = ReadAmountMultipleOfFive(); // Read a valid amount that is a multiple of 5
-	cout << "\n\n";
-	ProcessWithdrawalIfPossible(amount); // Process the withdrawal if possible
 }
 
 // Reads a valid amount for deposit (must be positive)
@@ -254,57 +326,17 @@ void ATM::PerformDepositOption(const int& amount)
 	}
 }
 
-// Displays deposit screen and processes deposit
-void ATM::ShowDepositScreen() {
-	ConsoleHelper::ShowScreenHeader("Deposit Screen"); // Show the deposit screen header
-
-	int amount = ReadAmountForDeposit(); // Read a valid amount for deposit
-
-	cout << "\n\n";
-
-	PerformDepositOption(amount); // Perform the deposit operation with the entered amount
-}
-
 // Shows client's current balance
 void ATM::ShowAccountBalance() const{
 	cout << "Your Balance is : " << LoggedClient.getAccountBalance() << endl;
 }
 
-// Displays balance checking screen
-void ATM::ShowCheckBalanceScreen() const{
-	ConsoleHelper::ShowScreenHeader("Check Balance Screen");
-	ShowAccountBalance();
-}
 
-// Executes the selected main menu option
-void ATM::PerformMainMenuOption(const enMainMenuOptions& enMainMenuOption) {
-	switch (enMainMenuOption) {
-	case eQuickWithdraw:
-		ConsoleHelper::ClearScreen(); // Clear the screen before showing quick withdraw options
-		ShowQuickWithdrawScreen(); // Show the quick withdraw screen
-		GoBackToMainMenu();
-		break;
-	case eNormalWithdraw:
-		ConsoleHelper::ClearScreen(); // Clear the screen before showing normal withdraw options
-		ShowNormalWithdrawScreen(); // Show the normal withdraw screen
-		GoBackToMainMenu();
-		break;
-	case eDeposit:
-		ConsoleHelper::ClearScreen(); // Clear the screen before showing deposit options
-		ShowDepositScreen(); // Show the deposit screen
-		GoBackToMainMenu();
-		break;
-	case eCheckBalance:
-		ConsoleHelper::ClearScreen(); // Clear the screen before showing balance
-		ShowCheckBalanceScreen(); // Show the current account balance
-		GoBackToMainMenu();
-		break;
-	case eLogout:
-		ConsoleHelper::ClearScreen();
-		break;
-	}
-}
+bool ATM::LoadClientInfo(const string& AccountNumber, const string& PinCode, const vector<ClientInfo>& clients) // Attempts to load client information based on account number and pin code
+{
 
+	return FindClientByAccountNumberAndPinCode(AccountNumber, PinCode, LoggedClient, LoggedClientIndex, clients) ? true : false; // Attempt to find the client using the provided account number and pin code
+}
 // Pauses until the user presses a key to return to the main menu
 void ATM::GoBackToMainMenu() const{
 	cout << "\n\n";
@@ -312,30 +344,6 @@ void ATM::GoBackToMainMenu() const{
 	system("pause>nul");
 }
 
-// Displays the main ATM menu loop
-void ATM::ShowMainMenuScreen() {
-	int choice;
-	do
-	{
-		ConsoleHelper::ClearScreen(); // Clear the screen before showing the menu
 
-		ConsoleHelper::ShowScreenHeader("ATM Main Menu Screen");
-
-		ShowMainMenuOptions(); // Display main menu options
-
-		cout << "=====================================\n";
-
-		choice = DataReader::PromptAndReadNumber("Please enter your choice [1 - 5]: "); // Read user choice
-
-		PerformMainMenuOption((enMainMenuOptions)choice); // Perform the action based on user choice
-
-	} while (choice != 5); // Exit on logout
-}
-
-bool ATM::LoadClientInfo(const string& AccountNumber, const string& PinCode, const vector<ClientInfo>& clients) // Attempts to load client information based on account number and pin code
-{
-
-	return FindClientByAccountNumberAndPinCode(AccountNumber, PinCode, LoggedClient, LoggedClientIndex, clients) ? true : false; // Attempt to find the client using the provided account number and pin code
-}
 
 
